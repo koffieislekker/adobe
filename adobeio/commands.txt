@@ -1,0 +1,9 @@
+# Get Open WSK
+https://github.com/apache/incubator-openwhisk-cli/releases
+
+# Link WSK to Adobe IO runtime
+wsk property set --apihost runtime.adobe.io --auth e2619549-8124-48ea-be91-2e7ebdcf0ce7:EyOstFNOs1fqQOXN0WmgzlHzmA6XzPSog4cZn687xXhNf7rfBuGp32inTAl9UPxI --namespace beneluxbootcamp
+
+# Create package
+wks package create team1
+
