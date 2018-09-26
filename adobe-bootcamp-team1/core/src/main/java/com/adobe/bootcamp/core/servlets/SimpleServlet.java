@@ -15,20 +15,21 @@
  */
 package com.adobe.bootcamp.core.servlets;
 
-import com.day.cq.commons.jcr.JcrConstants;
+import com.adobe.acs.commons.adobeio.service.EndpointService;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
-import org.apache.sling.api.resource.Resource;
-import org.apache.sling.api.servlets.HttpConstants;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
-import org.apache.sling.api.resource.ValueMap;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Servlet that writes some sample content into the response. It is mounted for
@@ -36,22 +37,47 @@ import java.io.IOException;
  * {@link SlingSafeMethodsServlet} shall be used for HTTP methods that are
  * idempotent. For write operations use the {@link SlingAllMethodsServlet}.
  */
-@Component(service=Servlet.class,
-           property={
-                   Constants.SERVICE_DESCRIPTION + "=Simple Demo Servlet",
-                   "sling.servlet.methods=" + HttpConstants.METHOD_GET,
-                   "sling.servlet.resourceTypes="+ "adobe-bootcamp-team1/components/structure/page",
-                   "sling.servlet.extensions=" + "txt"
-           })
+@Component(service = Servlet.class,
+        property = {
+                Constants.SERVICE_DESCRIPTION + "=Get profile data from user",
+                "sling.servlet.paths=/bin/cmp"})
 public class SimpleServlet extends SlingSafeMethodsServlet {
 
     private static final long serialVersionUID = 1L;
 
+    @Reference(target = "(id=campaign-activites)")
+    private EndpointService endpointService;
+
     @Override
-    protected void doGet(final SlingHttpServletRequest req,
-            final SlingHttpServletResponse resp) throws ServletException, IOException {
-        final Resource resource = req.getResource();
-        resp.setContentType("text/plain");
-        resp.getWriter().write("Title = " + resource.getValueMap().get(JcrConstants.JCR_TITLE));
+    protected void doGet(final SlingHttpServletRequest request,
+                         final SlingHttpServletResponse response) throws IOException {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+
+        String customerId = Objects.requireNonNull(request.getRequestParameterMap().getValue("customerId")).getString();
+        JsonObject customerProfile = new JsonObject();
+
+        if(endpointService.isConnected()){
+            JsonObject result = endpointService.performIO_Action();
+            result.getAsJsonArray("content").iterator().forEachRemaining(profile -> {
+                if(customerId.equals(profile.getAsJsonObject().get("PKey").getAsString())){
+                    JsonObject customerJsonObject = profile.getAsJsonObject();
+                    customerProfile.addProperty("customerId", customerJsonObject.get("PKey").getAsString());
+                    customerProfile.addProperty("cusChristmasbuyer", customerJsonObject.get("cusChristmasbuyer").getAsBoolean());
+                    customerProfile.addProperty("cusCity", customerJsonObject.get("cusCity").getAsString());
+                    customerProfile.addProperty("cusCompanyname", customerJsonObject.get("cusCompanyname").getAsString());
+                    customerProfile.addProperty("cusCompanytype", customerJsonObject.get("cusCompanytype").getAsString());
+                    customerProfile.addProperty("cusEmailadress", customerJsonObject.get("cusEmailadress").getAsString());
+                    customerProfile.addProperty("cusName", customerJsonObject.get("cusName").getAsString());
+                    customerProfile.addProperty("cusName", customerJsonObject.get("cusNrofemployees").getAsInt());
+                }
+            });
+        }
+
+        Gson gson = new Gson();
+
+        response.getWriter().write(gson.toJson(customerProfile));
+
+
     }
 }
