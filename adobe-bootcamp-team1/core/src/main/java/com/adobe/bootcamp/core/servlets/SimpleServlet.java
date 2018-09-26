@@ -27,7 +27,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.Servlet;
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -40,8 +39,10 @@ import java.util.Objects;
 @Component(service = Servlet.class,
         property = {
                 Constants.SERVICE_DESCRIPTION + "=Get profile data from user",
-                "sling.servlet.paths=/bin/cmp"})
-public class SimpleServlet extends SlingSafeMethodsServlet {
+                "sling.servlet.paths=/bin/cmp",
+                "sling.servlet.methods=POST",
+                "sling.servlet.methods=GET"})
+public class SimpleServlet extends SlingAllMethodsServlet {
 
     private static final long serialVersionUID = 1L;
 
@@ -57,10 +58,10 @@ public class SimpleServlet extends SlingSafeMethodsServlet {
         String customerId = Objects.requireNonNull(request.getRequestParameterMap().getValue("customerId")).getString();
         JsonObject customerProfile = new JsonObject();
 
-        if(endpointService.isConnected()){
+        if (endpointService.isConnected()) {
             JsonObject result = endpointService.performIO_Action();
             result.getAsJsonArray("content").iterator().forEachRemaining(profile -> {
-                if(customerId.equals(profile.getAsJsonObject().get("PKey").getAsString())){
+                if (customerId.equals(profile.getAsJsonObject().get("PKey").getAsString())) {
                     JsonObject customerJsonObject = profile.getAsJsonObject();
                     customerProfile.addProperty("customerId", customerJsonObject.get("PKey").getAsString());
                     customerProfile.addProperty("cusChristmasbuyer", customerJsonObject.get("cusChristmasbuyer").getAsBoolean());
@@ -80,4 +81,16 @@ public class SimpleServlet extends SlingSafeMethodsServlet {
 
 
     }
+
+    @Override
+    protected void doPost(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException {
+
+        String updateEndpoint = endpointService.getUrl() + "/" + Objects.requireNonNull(request.getRequestParameter("customerId")).getString();
+
+        //(String url, String method, String[] headers, com.google.gson.JsonObject payload)
+        JsonObject propertyToUpdate = new JsonObject();
+        propertyToUpdate.addProperty(Objects.requireNonNull(request.getRequestParameter("view")).getString(), true);
+        endpointService.performIO_Action(updateEndpoint, "PATCH", null, propertyToUpdate);
+    }
+
 }
