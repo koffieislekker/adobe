@@ -206,13 +206,6 @@
                         <failOnMissingEmbed>true</failOnMissingEmbed>
                         <userId>${vault.user}</userId>
                         <password>${vault.password}</password>
-                        <subPackages>
-                            <subPackage>
-                                <groupId>com.adobe.acs</groupId>
-                                <artifactId>acs-aem-commons-content</artifactId>
-                                <filter>true</filter>
-                            </subPackage>
-                        </subPackages>
                     </configuration>
                 </plugin>
                 <!-- Apache Felix Bundle Plugin -->
