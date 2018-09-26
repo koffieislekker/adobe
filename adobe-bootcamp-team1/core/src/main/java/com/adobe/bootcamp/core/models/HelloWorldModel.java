@@ -19,11 +19,13 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.adobe.acs.commons.adobeio.service.EndpointService;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.jcr.resource.api.JcrResourceConstants;
 import org.apache.sling.models.annotations.Default;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.settings.SlingSettingsService;
+import org.osgi.service.component.annotations.Reference;
 
 @Model(adaptables=Resource.class)
 public class HelloWorldModel {
@@ -34,14 +36,16 @@ public class HelloWorldModel {
     @Inject @Named(JcrResourceConstants.SLING_RESOURCE_TYPE_PROPERTY) @Default(values="No resourceType")
     protected String resourceType;
 
+    @Reference(target = "(id=campaign-activites)")
+    private EndpointService endpointService;
+
     private String message;
 
     @PostConstruct
     protected void init() {
         message = "\tHello World!\n";
-        message += "\tThis is instance: " + settings.getSlingId() + "\n";
-        message += "\tResource type is: " + resourceType + "\n";
     }
+
 
     public String getMessage() {
         return message;
