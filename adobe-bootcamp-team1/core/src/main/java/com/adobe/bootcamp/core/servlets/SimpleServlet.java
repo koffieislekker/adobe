@@ -17,6 +17,7 @@ package com.adobe.bootcamp.core.servlets;
 
 import com.adobe.acs.commons.adobeio.service.EndpointService;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
@@ -29,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 import javax.servlet.Servlet;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Servlet that writes some sample content into the response. It is mounted for
@@ -59,9 +61,14 @@ public class SimpleServlet extends SlingAllMethodsServlet {
         JsonObject customerProfile = new JsonObject();
 
         if (endpointService.isConnected()) {
-            JsonObject result = endpointService.performIO_Action();
+
+            String getCustomerProfileEndpoint = endpointService.getUrl() + "/byCrmid?crmid_parameter=" + customerId ;
+
+
+            JsonObject result = endpointService.performIO_Action(getCustomerProfileEndpoint, "GET", null, null);
+
             result.getAsJsonArray("content").iterator().forEachRemaining(profile -> {
-                if (customerId.equals(profile.getAsJsonObject().get("PKey").getAsString())) {
+                if (customerId.equals(profile.getAsJsonObject().get("cusCrmid").getAsString())) {
                     JsonObject customerJsonObject = profile.getAsJsonObject();
                     customerProfile.addProperty("customerId", customerJsonObject.get("PKey").getAsString());
                     customerProfile.addProperty("cusChristmasbuyer", customerJsonObject.get("cusChristmasbuyer").getAsBoolean());
@@ -85,12 +92,36 @@ public class SimpleServlet extends SlingAllMethodsServlet {
     @Override
     protected void doPost(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException {
 
-        String updateEndpoint = endpointService.getUrl() + "/" + Objects.requireNonNull(request.getRequestParameter("customerId")).getString();
+        String profileId = getProfileId(request);
+
+        String updateEndpoint = endpointService.getUrl() + "/" + profileId;
 
         //(String url, String method, String[] headers, com.google.gson.JsonObject payload)
         JsonObject propertyToUpdate = new JsonObject();
         propertyToUpdate.addProperty(Objects.requireNonNull(request.getRequestParameter("view")).getString(), true);
         endpointService.performIO_Action(updateEndpoint, "PATCH", null, propertyToUpdate);
+    }
+
+    private String getProfileId(SlingHttpServletRequest request) {
+        String customerId = Objects.requireNonNull(request.getRequestParameterMap().getValue("customerId")).getString();
+        JsonObject customerProfile = new JsonObject();
+        String profileId = "";
+
+        if (endpointService.isConnected()) {
+
+            String getCustomerProfileEndpoint = endpointService.getUrl() + "/byCrmid?crmid_parameter=" + customerId;
+
+
+            JsonObject result = endpointService.performIO_Action(getCustomerProfileEndpoint, "GET", null, null);
+
+            JsonElement customerJsonObject = result.getAsJsonArray("content").iterator().next();
+            if (customerId.equals(customerJsonObject.getAsJsonObject().get("cusCrmid").getAsString())) {
+                JsonObject tmpObject = customerJsonObject.getAsJsonObject();
+                profileId = tmpObject.get("PKey").getAsString();
+            }
+        }
+
+        return profileId;
     }
 
 }
