@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workspaceFilter version="1.0">
+    <filter root="/conf/adobe-bootcamp-team1" />
+    <filter root="/content/adobe-bootcamp-team1" />
+    <filter root="/content/dam/adobe-bootcamp-team1" />
+</workspaceFilter>

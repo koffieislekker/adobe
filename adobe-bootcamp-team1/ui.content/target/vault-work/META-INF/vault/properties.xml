@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>adobe-bootcamp-team1 - UI content</comment>
+<entry key="createdBy">tomine</entry>
+<entry key="name">adobe-bootcamp-team1.ui.content</entry>
+<entry key="created">2018-09-26T10:45:30.337+0200</entry>
+<entry key="groupId">com.adobe.bootcamp</entry>
+<entry key="version">1.0-SNAPSHOT</entry>
+<entry key="requiresRoot">false</entry>
+<entry key="group">adobe-bootcamp-team1</entry>
+<entry key="description">UI content package for adobe-bootcamp-team1</entry>
+<entry key="artifactId">adobe-bootcamp-team1.ui.content</entry>
+<entry key="path">/etc/packages/adobe-bootcamp-team1/adobe-bootcamp-team1.ui.content.zip</entry>
+</properties>

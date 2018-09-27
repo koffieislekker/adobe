@@ -77,6 +77,8 @@ function main(params) {
 
                 var owner = true;
 
+                var crmid = Math.floor(Math.random() * 101);
+
                 var jsonObj = new Object();
                 jsonObj.firstname = firstname;
                 jsonObj.lastname = lastname;
@@ -87,6 +89,7 @@ function main(params) {
                 jsonObj.companyType = companyType;
                 jsonObj.city = city;
                 jsonObj.numberofemployees = numberofemployees;
+                jsonObj.crmid = crmid;
 
                 console.log(jsonObj);
 

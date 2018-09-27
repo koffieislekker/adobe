@@ -66,6 +66,7 @@ var createAcsProfile = function(contact,accessToken) {
             jsonObj.cusCompanytype = contact['companyType'];
             jsonObj.cusNrofemployees = contact['numberofemployees'];
             jsonObj.cusCity = contact['city'];
+            jsonObj.cusCrmid = contact['crmid'];
         
         var messageString = JSON.stringify(jsonObj);
 

@@ -1,0 +1,5 @@
+com/adobe/bootcamp/core/models/HelloWorldModelTest.class
+com/adobe/bootcamp/core/filters/LoggingFilterTest.class
+com/adobe/bootcamp/core/servlets/SimpleServletTest.class
+com/adobe/bootcamp/core/listeners/SimpleResourceListenerTest.class
+com/adobe/bootcamp/core/schedulers/SimpleScheduledTaskTest.class
